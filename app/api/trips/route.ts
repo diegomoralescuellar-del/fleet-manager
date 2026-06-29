@@ -9,7 +9,7 @@ export async function GET(req: Request) {
   const from  = searchParams.get('from')
   const to    = searchParams.get('to')
 
-  let query = supabase
+  let query = getDb()
     .from('trips').select('*, vehicles(plate, type), fuel_logs(*)')
     .order('started_at', { ascending: false })
 

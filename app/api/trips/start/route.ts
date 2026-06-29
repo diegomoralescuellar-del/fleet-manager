@@ -12,7 +12,7 @@ export async function POST(req: Request) {
 
   const { error } = await getDb().from('trips').insert({
     id: trip_id, vehicle_id, driver_id: DRIVER_ID, km_start, started_at, status: 'open',
-  })
+  } as any)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   await getDb().from('vehicles').update({ status: 'in_use' }).eq('id', vehicle_id)

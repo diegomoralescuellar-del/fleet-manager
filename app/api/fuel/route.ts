@@ -10,7 +10,7 @@ export async function POST(req: Request) {
 
   const { error } = await getDb().from('fuel_logs').insert({
     trip_id, liters, total_cost, photo_url: photo_url ?? null, logged_at,
-  })
+  } as any)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
