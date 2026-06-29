@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+export const dynamic = 'force-dynamic'
 
 export async function GET() {
   await supabase.rpc('release_stale_vehicles')

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+export const dynamic = 'force-dynamic'
 
 export async function POST(req: Request) {
   const { trip_id, vehicle_id, km_end, ended_at } = await req.json()

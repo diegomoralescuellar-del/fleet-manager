@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+export const dynamic = 'force-dynamic'
 
 const DRIVER_ID = '20248e43-d078-46d6-a4ed-3d314484419f'
 
