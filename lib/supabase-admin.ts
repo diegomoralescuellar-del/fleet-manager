@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
-let client: ReturnType<typeof createClient> | null = null
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let client: any = null
 
 export function getSupabaseAdmin() {
   if (!client) {
@@ -9,5 +10,5 @@ export function getSupabaseAdmin() {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
   }
-  return client
+  return client as any
 }
