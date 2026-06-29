@@ -34,12 +34,12 @@ export default function FuelPage() {
   async function uploadPhoto(file: File, tripId: string): Promise<string | null> {
     const ext = file.name.split('.').pop()
     const path = `fuel-tickets/${tripId}/${Date.now()}.${ext}`
-    const { error } = await supabase.storage.from('fuel-photos').upload(path, file)
+    const { error } = await supabase.storage.from('fleet-photos').upload(path, file)
     if (error) {
       console.error('Upload error:', error)
       return null
     }
-    const { data } = supabase.storage.from('fuel-photos').getPublicUrl(path)
+    const { data } = supabase.storage.from('fleet-photos').getPublicUrl(path)
     return data.publicUrl
   }
 
