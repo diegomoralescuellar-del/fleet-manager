@@ -27,7 +27,7 @@ export default function VehiclesPage() {
   const [form, setForm] = useState({ plate: '', type: 'auto' as typeof TIPOS[number] })
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '' })
+  const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '', vtv_status: 'habilitada' })
   const [uploadingVtv, setUploadingVtv] = useState(false)
   const vtvRef = useRef<HTMLInputElement>(null)
 
