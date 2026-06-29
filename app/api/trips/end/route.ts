@@ -9,11 +9,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Faltan datos' }, { status: 400 })
 
   const { error } = await getDb()
-    .from('trips').update({ km_end, ended_at, status: 'closed' }).eq('id', trip_id)
+    .from('trips').update({ km_end, ended_at, status: 'closed' } as any).eq('id', trip_id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   if (vehicle_id)
-    await getDb().from('vehicles').update({ status: 'available' }).eq('id', vehicle_id)
+    await getDb().from('vehicles').update({ status: 'available' } as any).eq('id', vehicle_id)
 
   return NextResponse.json({ ok: true })
 }
