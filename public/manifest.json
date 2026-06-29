@@ -1,6 +1,6 @@
 {
-  "name": "Fleet Manager",
-  "short_name": "Fleet",
+  "name": "Driver Miavasa",
+  "short_name": "Driver Miavasa",
   "description": "Gestión de flota de vehículos",
   "start_url": "/",
   "display": "standalone",
