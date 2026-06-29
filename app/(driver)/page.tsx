@@ -119,7 +119,7 @@ export default function DriverHome() {
   return (
     <div className="flex flex-col gap-6">
       <div className="text-center pt-4">
-        <h1 className="text-3xl font-bold tracking-tight">Fleet Manager</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Driver Miavasa</h1>
         <p className="text-gray-400 mt-1">Iniciar jornada</p>
       </div>
 
