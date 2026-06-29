@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   if (!trip_id || !km_end)
     return NextResponse.json({ error: 'Faltan datos' }, { status: 400 })
 
-  const { error } = await supabase
+  const { error } = await getDb()
     .from('trips').update({ km_end, ended_at, status: 'closed' }).eq('id', trip_id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
