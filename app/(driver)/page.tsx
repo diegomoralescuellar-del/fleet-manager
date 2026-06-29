@@ -143,17 +143,6 @@ export default function DriverHome() {
                   <span className="text-4xl">{VEHICLE_ICONS[v.type]}</span>
                   <span className="font-bold text-lg mt-1">{v.plate}</span>
                   <span className="text-gray-400 text-sm capitalize">{v.type}</span>
-                  {v.vtv_url && (
-                    <a
-                      href={v.vtv_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="mt-2 text-xs text-blue-400 hover:text-blue-300 underline"
-                    >
-                      📄 VTV
-                    </a>
-                  )}
                 </label>
               ))}
             </div>
@@ -161,25 +150,6 @@ export default function DriverHome() {
           {errors.vehicle_id && <p className="text-red-400 text-sm">{errors.vehicle_id.message}</p>}
         </div>
 
-        {/* Límite de combustible */}
-        {fuelLimit !== null && usedLiters !== null && (
-          <div className="bg-gray-900 rounded-2xl p-4 flex flex-col gap-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-400">⛽ Combustible mensual</span>
-              <span className={fuelRemaining === 0 ? 'text-red-400 font-bold' : 'text-white'}>
-                {fuelRemaining?.toFixed(1)}L restantes / {fuelLimit}L
-              </span>
-            </div>
-            <div className="w-full bg-gray-700 rounded-full h-3">
-              <div
-                className={`h-3 rounded-full transition-all ${
-                  fuelUsedPct! >= 90 ? 'bg-red-500' : fuelUsedPct! >= 70 ? 'bg-yellow-500' : 'bg-green-500'
-                }`}
-                style={{ width: `${fuelUsedPct}%` }}
-              />
-            </div>
-          </div>
-        )}
 
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">

@@ -7,13 +7,14 @@ type ActiveTrip = {
   vehicle_id: string
   km_start: number
   started_at: string
-  vehicles: { plate: string; type: string }
+  vehicles: { plate: string; type: string; vtv_url?: string | null; fuel_limit?: number | null }
 }
 
 export default function HubPage() {
   const router = useRouter()
   const [trip, setTrip] = useState<ActiveTrip | null>(null)
   const [loading, setLoading] = useState(true)
+  const [usedLiters, setUsedLiters] = useState<number | null>(null)
 
   useEffect(() => {
     fetch('/api/trips/active')
@@ -21,22 +22,24 @@ export default function HubPage() {
       .then((data) => {
         if (!data) { router.replace('/'); return }
         setTrip(data)
-        // Actualizar sessionStorage con datos frescos de la DB
         sessionStorage.setItem('active_trip_id', data.id)
         sessionStorage.setItem('active_vehicle_id', data.vehicle_id)
         sessionStorage.setItem('active_km_start', String(data.km_start))
         sessionStorage.setItem('active_plate', data.vehicles?.plate ?? '')
+        // Cargar litros usados este mes
+        fetch(`/api/vehicles/${data.vehicle_id}/fuel-used`)
+          .then((r) => r.json())
+          .then(({ used }) => setUsedLiters(used ?? 0))
       })
       .finally(() => setLoading(false))
   }, [router])
 
-  if (loading) return (
-    <div className="flex items-center justify-center h-64 text-gray-500">
-      Cargando...
-    </div>
-  )
-
+  if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">Cargando...</div>
   if (!trip) return null
+
+  const fuelLimit = trip.vehicles?.fuel_limit ?? null
+  const fuelRemaining = fuelLimit !== null && usedLiters !== null ? Math.max(fuelLimit - usedLiters, 0) : null
+  const fuelUsedPct = fuelLimit && usedLiters !== null ? Math.min((usedLiters / fuelLimit) * 100, 100) : null
 
   return (
     <div className="flex flex-col gap-6 pt-4">
@@ -46,23 +49,42 @@ export default function HubPage() {
         <p className="text-gray-400 text-sm mt-1">
           Km inicial: <span className="text-white font-semibold">{trip.km_start.toLocaleString()}</span>
         </p>
+        {trip.vehicles?.vtv_url && (
+          <a href={trip.vehicles.vtv_url} target="_blank" rel="noopener noreferrer"
+            className="inline-block mt-2 text-xs text-blue-400 hover:text-blue-300 underline">
+            📄 Ver VTV
+          </a>
+        )}
       </div>
+
+      {/* Límite de combustible */}
+      {fuelLimit !== null && usedLiters !== null && (
+        <div className="bg-gray-900 rounded-2xl p-4 flex flex-col gap-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-gray-400">⛽ Combustible mensual</span>
+            <span className={fuelRemaining === 0 ? 'text-red-400 font-bold' : 'text-white'}>
+              {fuelRemaining?.toFixed(1)}L restantes / {fuelLimit}L
+            </span>
+          </div>
+          <div className="w-full bg-gray-700 rounded-full h-3">
+            <div className={`h-3 rounded-full transition-all ${
+              fuelUsedPct! >= 90 ? 'bg-red-500' : fuelUsedPct! >= 70 ? 'bg-yellow-500' : 'bg-green-500'
+            }`} style={{ width: `${fuelUsedPct}%` }} />
+          </div>
+        </div>
+      )}
 
       <p className="text-center text-gray-400">¿Qué querés hacer?</p>
 
-      <button
-        onClick={() => router.push('/fuel')}
-        className="w-full bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 rounded-2xl py-8 flex flex-col items-center gap-2 transition-colors"
-      >
+      <button onClick={() => router.push('/fuel')}
+        className="w-full bg-yellow-500 hover:bg-yellow-400 active:bg-yellow-600 rounded-2xl py-8 flex flex-col items-center gap-2 transition-colors">
         <span className="text-5xl">⛽</span>
         <span className="text-xl font-bold text-gray-900">Cargar Combustible</span>
         <span className="text-gray-800 text-sm">Registrar litros y costo</span>
       </button>
 
-      <button
-        onClick={() => router.push('/end')}
-        className="w-full bg-green-600 hover:bg-green-500 active:bg-green-700 rounded-2xl py-8 flex flex-col items-center gap-2 transition-colors"
-      >
+      <button onClick={() => router.push('/end')}
+        className="w-full bg-green-600 hover:bg-green-500 active:bg-green-700 rounded-2xl py-8 flex flex-col items-center gap-2 transition-colors">
         <span className="text-5xl">🏁</span>
         <span className="text-xl font-bold">Finalizar Jornada</span>
         <span className="text-gray-300 text-sm">Registrar km final</span>
