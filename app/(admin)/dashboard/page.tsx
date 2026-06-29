@@ -86,6 +86,12 @@ export default function AdminDashboard() {
           </div>
           <div className="flex gap-3">
             <a
+              href="/"
+              className="bg-gray-700 hover:bg-gray-600 px-5 py-2.5 rounded-xl font-semibold transition-colors"
+            >
+              🚛 Conductor
+            </a>
+            <a
               href="/vehicles"
               className="bg-gray-700 hover:bg-gray-600 px-5 py-2.5 rounded-xl font-semibold transition-colors"
             >
