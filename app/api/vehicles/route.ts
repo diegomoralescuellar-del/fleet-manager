@@ -4,9 +4,8 @@ export const dynamic = 'force-dynamic'
 const getDb = () => getSupabaseAdmin()
 
 export async function GET() {
-  await getDb().rpc('release_stale_vehicles')
   const { data, error } = await getDb()
-    .from('vehicles').select('*').eq('status', 'available').order('plate')
+    .from('vehicles').select('*').neq('status', 'maintenance').order('plate')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data, { headers: { 'Cache-Control': 'no-store' } })
 }
