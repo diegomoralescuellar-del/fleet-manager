@@ -15,8 +15,8 @@ const STATUS_LABELS: Record<string, string> = {
   available: 'Disponible', in_use: 'En uso', maintenance: 'Mantenimiento',
 }
 
-type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null }
-type EditState = { password: string; fuel_limit: string; vtv_url: string }
+type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null; vtv_status?: string }
+type EditState = { password: string; fuel_limit: string; vtv_url: string; vtv_status: string }
 
 export default function VehiclesPage() {
   const router = useRouter()
@@ -79,6 +79,7 @@ export default function VehiclesPage() {
       password: v.password ?? '',
       fuel_limit: v.fuel_limit != null ? String(v.fuel_limit) : '',
       vtv_url: v.vtv_url ?? '',
+      vtv_status: v.vtv_status ?? 'habilitada',
     })
   }
 
@@ -100,6 +101,7 @@ export default function VehiclesPage() {
         password: editState.password || null,
         fuel_limit: editState.fuel_limit ? Number(editState.fuel_limit) : null,
         vtv_url: editState.vtv_url || null,
+        vtv_status: editState.vtv_status,
       }),
     })
     setEditingId(null)
@@ -176,6 +178,11 @@ export default function VehiclesPage() {
                       📄 VTV
                     </a>
                   )}
+                  {v.vtv_url && (
+                    <span className={`text-xs px-2 py-1 rounded-lg font-semibold ${v.vtv_status === 'vencida' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
+                      {v.vtv_status === 'vencida' ? '🔴 VTV Vencida' : '🟢 VTV Habilitada'}
+                    </span>
+                  )}
                 </div>
                 <div className="flex items-center gap-3">
                   <select value={v.status} onChange={(e) => handleStatus(v.id, e.target.value as Vehicle['status'])}
@@ -225,6 +232,22 @@ export default function VehiclesPage() {
                         onChange={(e) => setEditState((s) => ({ ...s, fuel_limit: e.target.value }))}
                         className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500"
                       />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-xs text-gray-400 uppercase tracking-wider">🚦 Estado VTV</label>
+                    <div className="flex gap-2">
+                      {['habilitada', 'vencida'].map((s) => (
+                        <button key={s} type="button"
+                          onClick={() => setEditState((e) => ({ ...e, vtv_status: s }))}
+                          className={`px-4 py-2 rounded-xl border-2 font-semibold text-sm transition-colors ${
+                            editState.vtv_status === s
+                              ? s === 'vencida' ? 'border-red-500 bg-red-500/20 text-red-400' : 'border-green-500 bg-green-500/20 text-green-400'
+                              : 'border-gray-700 text-gray-400 hover:border-gray-500'
+                          }`}>
+                          {s === 'vencida' ? '🔴 Vencida' : '🟢 Habilitada'}
+                        </button>
+                      ))}
                     </div>
                   </div>
                   <div className="flex flex-col gap-1">

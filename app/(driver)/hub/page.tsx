@@ -7,7 +7,7 @@ type ActiveTrip = {
   vehicle_id: string
   km_start: number
   started_at: string
-  vehicles: { plate: string; type: string; vtv_url?: string | null; fuel_limit?: number | null }
+  vehicles: { plate: string; type: string; vtv_url?: string | null; fuel_limit?: number | null; vtv_status?: string }
 }
 
 export default function HubPage() {
@@ -50,10 +50,19 @@ export default function HubPage() {
           Km inicial: <span className="text-white font-semibold">{trip.km_start.toLocaleString()}</span>
         </p>
         {trip.vehicles?.vtv_url && (
-          <a href={trip.vehicles.vtv_url} target="_blank" rel="noopener noreferrer"
-            className="inline-block mt-2 text-xs text-blue-400 hover:text-blue-300 underline">
-            📄 Ver VTV
-          </a>
+          <div className="flex flex-col items-center gap-1 mt-2">
+            <a href={trip.vehicles.vtv_url} target="_blank" rel="noopener noreferrer"
+              className="text-xs text-blue-400 hover:text-blue-300 underline">
+              📄 Ver VTV
+            </a>
+            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+              trip.vehicles.vtv_status === 'vencida'
+                ? 'bg-red-500/20 text-red-400'
+                : 'bg-green-500/20 text-green-400'
+            }`}>
+              {trip.vehicles.vtv_status === 'vencida' ? '🔴 VTV Vencida' : '🟢 VTV Habilitada'}
+            </span>
+          </div>
         )}
       </div>
 
