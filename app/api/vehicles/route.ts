@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 export const dynamic = 'force-dynamic'
+const getDb = () => getSupabaseAdmin()
 
 export async function GET() {
-  await supabase.rpc('release_stale_vehicles')
+  await getDb().rpc('release_stale_vehicles')
   const { data, error } = await supabase
     .from('vehicles').select('*').eq('status', 'available').order('plate')
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

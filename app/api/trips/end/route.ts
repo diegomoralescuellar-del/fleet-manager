@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
-import { supabaseAdmin as supabase } from '@/lib/supabase-admin'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 export const dynamic = 'force-dynamic'
+const getDb = () => getSupabaseAdmin()
 
 export async function POST(req: Request) {
   const { trip_id, vehicle_id, km_end, ended_at } = await req.json()
@@ -12,7 +13,7 @@ export async function POST(req: Request) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   if (vehicle_id)
-    await supabase.from('vehicles').update({ status: 'available' }).eq('id', vehicle_id)
+    await getDb().from('vehicles').update({ status: 'available' }).eq('id', vehicle_id)
 
   return NextResponse.json({ ok: true })
 }
