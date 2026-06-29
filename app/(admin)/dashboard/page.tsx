@@ -176,19 +176,21 @@ export default function AdminDashboard() {
                   <th className="text-right px-4 py-3">Recorrido</th>
                   <th className="text-right px-4 py-3">Litros</th>
                   <th className="text-right px-4 py-3">Costo ($)</th>
+                  <th className="text-center px-4 py-3">Fotos</th>
                   <th className="text-center px-4 py-3">Estado</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
-                  <tr><td colSpan={9} className="text-center py-12 text-gray-500">Cargando...</td></tr>
+                  <tr><td colSpan={10} className="text-center py-12 text-gray-500">Cargando...</td></tr>
                 ) : trips.length === 0 ? (
-                  <tr><td colSpan={9} className="text-center py-12 text-gray-500">No hay registros</td></tr>
+                  <tr><td colSpan={10} className="text-center py-12 text-gray-500">No hay registros</td></tr>
                 ) : (
                   trips.map((t) => {
                     const kmTraveled = t.km_end ? t.km_end - t.km_start : null
                     const totalLiters = t.fuel_logs.reduce((s, f) => s + f.liters, 0)
                     const totalCostTrip = t.fuel_logs.reduce((s, f) => s + f.total_cost, 0)
+                    const photos = t.fuel_logs.filter((f) => f.photo_url)
                     return (
                       <tr key={t.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
                         <td className="px-4 py-3 font-bold">{t.vehicles?.plate}</td>
@@ -199,6 +201,18 @@ export default function AdminDashboard() {
                         <td className="px-4 py-3 text-right font-semibold">{kmTraveled ? `${kmTraveled.toLocaleString()} km` : '—'}</td>
                         <td className="px-4 py-3 text-right">{totalLiters > 0 ? `${totalLiters}L` : '—'}</td>
                         <td className="px-4 py-3 text-right">{totalCostTrip > 0 ? `$${totalCostTrip.toLocaleString()}` : '—'}</td>
+                        <td className="px-4 py-3 text-center">
+                          {photos.length > 0 ? (
+                            <div className="flex gap-1 justify-center">
+                              {photos.map((f, i) => (
+                                <a key={i} href={f.photo_url!} target="_blank" rel="noopener noreferrer"
+                                  className="bg-blue-600 hover:bg-blue-500 text-white text-xs px-2 py-1 rounded-lg transition-colors">
+                                  📷 {photos.length > 1 ? i + 1 : ''}
+                                </a>
+                              ))}
+                            </div>
+                          ) : <span className="text-gray-600">—</span>}
+                        </td>
                         <td className="px-4 py-3 text-center">
                           <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                             t.status === 'open'
