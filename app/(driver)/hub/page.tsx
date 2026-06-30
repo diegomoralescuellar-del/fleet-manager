@@ -7,7 +7,7 @@ type ActiveTrip = {
   vehicle_id: string
   km_start: number
   started_at: string
-  vehicles: { plate: string; type: string; vtv_url?: string | null; fuel_limit?: number | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string }
+  vehicles: { plate: string; type: string; vtv_url?: string | null; fuel_limit?: number | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string; multas_url?: string | null; cedula_url?: string | null }
 }
 
 export default function HubPage() {
@@ -53,6 +53,18 @@ export default function HubPage() {
           <div className="mt-2 text-sm text-gray-300">
             {trip.vehicles.responsable_nombre && <p>👤 {trip.vehicles.responsable_nombre}</p>}
             {trip.vehicles.responsable_dni && <p>🪪 DNI: {trip.vehicles.responsable_dni}</p>}
+          </div>
+        )}
+        {(trip.vehicles?.cedula_url || trip.vehicles?.multas_url) && (
+          <div className="flex gap-3 justify-center mt-2 flex-wrap">
+            {trip.vehicles.cedula_url && (
+              <a href={trip.vehicles.cedula_url} target="_blank" rel="noopener noreferrer"
+                className="text-xs text-blue-400 hover:text-blue-300 underline">📋 Cédula</a>
+            )}
+            {trip.vehicles.multas_url && (
+              <a href={trip.vehicles.multas_url} target="_blank" rel="noopener noreferrer"
+                className="text-xs text-orange-400 hover:text-orange-300 underline">🚨 Multas</a>
+            )}
           </div>
         )}
         {trip.vehicles?.vtv_url && (

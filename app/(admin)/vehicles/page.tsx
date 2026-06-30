@@ -15,8 +15,8 @@ const STATUS_LABELS: Record<string, string> = {
   available: 'Disponible', in_use: 'En uso', maintenance: 'Mantenimiento',
 }
 
-type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string }
-type EditState = { password: string; fuel_limit: string; vtv_url: string; vtv_status: string; responsable_nombre: string; responsable_dni: string }
+type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string; multas_url?: string | null; cedula_url?: string | null }
+type EditState = { password: string; fuel_limit: string; vtv_url: string; vtv_status: string; responsable_nombre: string; responsable_dni: string; multas_url: string; cedula_url: string }
 
 export default function VehiclesPage() {
   const router = useRouter()
@@ -27,7 +27,7 @@ export default function VehiclesPage() {
   const [form, setForm] = useState({ plate: '', type: 'auto' as typeof TIPOS[number] })
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '', vtv_status: 'habilitada', responsable_nombre: '', responsable_dni: '' })
+  const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '', vtv_status: 'habilitada', responsable_nombre: '', responsable_dni: '', multas_url: '', cedula_url: '' })
   const [uploadingVtv, setUploadingVtv] = useState(false)
   const vtvRef = useRef<HTMLInputElement>(null)
 
@@ -82,6 +82,8 @@ export default function VehiclesPage() {
       vtv_status: v.vtv_status ?? 'habilitada',
       responsable_nombre: v.responsable_nombre ?? '',
       responsable_dni: v.responsable_dni ?? '',
+      multas_url: v.multas_url ?? '',
+      cedula_url: v.cedula_url ?? '',
     })
   }
 
@@ -106,6 +108,8 @@ export default function VehiclesPage() {
         vtv_status: editState.vtv_status,
         responsable_nombre: editState.responsable_nombre || null,
         responsable_dni: editState.responsable_dni || null,
+        multas_url: editState.multas_url || null,
+        cedula_url: editState.cedula_url || null,
       }),
     })
     setEditingId(null)
@@ -284,6 +288,62 @@ export default function VehiclesPage() {
                           Ver actual
                         </a>
                       )}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs text-gray-400 uppercase tracking-wider">📋 PDF de Cédula</label>
+                      <div className="flex gap-2 items-center">
+                        <input type="file" accept="application/pdf" className="hidden"
+                          id={`cedula-${v.id}`}
+                          onChange={async (e) => {
+                            const f = e.target.files?.[0]; if (!f) return
+                            setUploadingVtv(true)
+                            const path = `cedula/${v.id}/${Date.now()}.pdf`
+                            const { error } = await supabase.storage.from('fleet-photos').upload(path, f, { upsert: true })
+                            if (!error) {
+                              const { data } = supabase.storage.from('fleet-photos').getPublicUrl(path)
+                              setEditState((s) => ({ ...s, cedula_url: data.publicUrl }))
+                            }
+                            setUploadingVtv(false)
+                          }} />
+                        <button type="button" onClick={() => document.getElementById(`cedula-${v.id}`)?.click()}
+                          disabled={uploadingVtv}
+                          className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50">
+                          📤 Subir PDF
+                        </button>
+                        {editState.cedula_url && (
+                          <a href={editState.cedula_url} target="_blank" rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 text-sm underline">Ver actual</a>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs text-gray-400 uppercase tracking-wider">🚨 PDF de Multas</label>
+                      <div className="flex gap-2 items-center">
+                        <input type="file" accept="application/pdf" className="hidden"
+                          id={`multas-${v.id}`}
+                          onChange={async (e) => {
+                            const f = e.target.files?.[0]; if (!f) return
+                            setUploadingVtv(true)
+                            const path = `multas/${v.id}/${Date.now()}.pdf`
+                            const { error } = await supabase.storage.from('fleet-photos').upload(path, f, { upsert: true })
+                            if (!error) {
+                              const { data } = supabase.storage.from('fleet-photos').getPublicUrl(path)
+                              setEditState((s) => ({ ...s, multas_url: data.publicUrl }))
+                            }
+                            setUploadingVtv(false)
+                          }} />
+                        <button type="button" onClick={() => document.getElementById(`multas-${v.id}`)?.click()}
+                          disabled={uploadingVtv}
+                          className="bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50">
+                          📤 Subir PDF
+                        </button>
+                        {editState.multas_url && (
+                          <a href={editState.multas_url} target="_blank" rel="noopener noreferrer"
+                            className="text-blue-400 hover:text-blue-300 text-sm underline">Ver actual</a>
+                        )}
+                      </div>
                     </div>
                   </div>
                   <button onClick={() => saveEdit(v.id)}
