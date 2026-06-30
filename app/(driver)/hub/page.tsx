@@ -7,7 +7,7 @@ type ActiveTrip = {
   vehicle_id: string
   km_start: number
   started_at: string
-  vehicles: { plate: string; type: string; vtv_url?: string | null; fuel_limit?: number | null; vtv_status?: string }
+  vehicles: { plate: string; type: string; vtv_url?: string | null; fuel_limit?: number | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string }
 }
 
 export default function HubPage() {
@@ -49,6 +49,12 @@ export default function HubPage() {
         <p className="text-gray-400 text-sm mt-1">
           Km inicial: <span className="text-white font-semibold">{trip.km_start.toLocaleString()}</span>
         </p>
+        {(trip.vehicles?.responsable_nombre || trip.vehicles?.responsable_dni) && (
+          <div className="mt-2 text-sm text-gray-300">
+            {trip.vehicles.responsable_nombre && <p>👤 {trip.vehicles.responsable_nombre}</p>}
+            {trip.vehicles.responsable_dni && <p>🪪 DNI: {trip.vehicles.responsable_dni}</p>}
+          </div>
+        )}
         {trip.vehicles?.vtv_url && (
           <div className="flex flex-col items-center gap-1 mt-2">
             <a href={trip.vehicles.vtv_url} target="_blank" rel="noopener noreferrer"

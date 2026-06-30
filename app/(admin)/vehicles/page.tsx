@@ -15,8 +15,8 @@ const STATUS_LABELS: Record<string, string> = {
   available: 'Disponible', in_use: 'En uso', maintenance: 'Mantenimiento',
 }
 
-type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null; vtv_status?: string }
-type EditState = { password: string; fuel_limit: string; vtv_url: string; vtv_status: string }
+type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string }
+type EditState = { password: string; fuel_limit: string; vtv_url: string; vtv_status: string; responsable_nombre: string; responsable_dni: string }
 
 export default function VehiclesPage() {
   const router = useRouter()
@@ -27,7 +27,7 @@ export default function VehiclesPage() {
   const [form, setForm] = useState({ plate: '', type: 'auto' as typeof TIPOS[number] })
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '', vtv_status: 'habilitada' })
+  const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '', vtv_status: 'habilitada', responsable_nombre: '', responsable_dni: '' })
   const [uploadingVtv, setUploadingVtv] = useState(false)
   const vtvRef = useRef<HTMLInputElement>(null)
 
@@ -80,6 +80,8 @@ export default function VehiclesPage() {
       fuel_limit: v.fuel_limit != null ? String(v.fuel_limit) : '',
       vtv_url: v.vtv_url ?? '',
       vtv_status: v.vtv_status ?? 'habilitada',
+      responsable_nombre: v.responsable_nombre ?? '',
+      responsable_dni: v.responsable_dni ?? '',
     })
   }
 
@@ -102,6 +104,8 @@ export default function VehiclesPage() {
         fuel_limit: editState.fuel_limit ? Number(editState.fuel_limit) : null,
         vtv_url: editState.vtv_url || null,
         vtv_status: editState.vtv_status,
+        responsable_nombre: editState.responsable_nombre || null,
+        responsable_dni: editState.responsable_dni || null,
       }),
     })
     setEditingId(null)
@@ -204,15 +208,29 @@ export default function VehiclesPage() {
               </div>
 
               {/* Info rápida */}
-              <div className="flex gap-4 mt-2 text-xs text-gray-500">
+              <div className="flex gap-4 mt-2 text-xs text-gray-500 flex-wrap">
                 {v.password ? <span>🔒 Con contraseña</span> : <span>🔓 Sin contraseña</span>}
                 {v.fuel_limit ? <span>⛽ Límite: {v.fuel_limit}L/mes</span> : <span>⛽ Sin límite</span>}
+                {v.responsable_nombre && <span>👤 {v.responsable_nombre}</span>}
+                {v.responsable_dni && <span>🪪 DNI: {v.responsable_dni}</span>}
               </div>
 
               {/* Panel de edición */}
               {editingId === v.id && (
                 <div className="mt-4 pt-4 border-t border-gray-800 flex flex-col gap-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs text-gray-400 uppercase tracking-wider">👤 Nombre del responsable</label>
+                      <input type="text" placeholder="Ej: Juan Pérez" value={editState.responsable_nombre}
+                        onChange={(e) => setEditState((s) => ({ ...s, responsable_nombre: e.target.value }))}
+                        className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+                    </div>
+                    <div className="flex flex-col gap-1">
+                      <label className="text-xs text-gray-400 uppercase tracking-wider">🪪 DNI del responsable</label>
+                      <input type="text" placeholder="Ej: 38123456" value={editState.responsable_dni}
+                        onChange={(e) => setEditState((s) => ({ ...s, responsable_dni: e.target.value }))}
+                        className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+                    </div>
                     <div className="flex flex-col gap-1">
                       <label className="text-xs text-gray-400 uppercase tracking-wider">🔒 Contraseña</label>
                       <input
