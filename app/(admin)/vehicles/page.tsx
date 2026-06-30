@@ -15,7 +15,7 @@ const STATUS_LABELS: Record<string, string> = {
   available: 'Disponible', in_use: 'En uso', maintenance: 'Mantenimiento',
 }
 
-type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string; multas_url?: string | null; cedula_url?: string | null }
+type VehicleExt = Vehicle & { password?: string; fuel_limit?: number | null; vtv_url?: string | null; vtv_status?: string; responsable_nombre?: string; responsable_dni?: string; multas_url?: string | null; cedula_url?: string | null; total_km?: number }
 type EditState = { password: string; fuel_limit: string; vtv_url: string; vtv_status: string; responsable_nombre: string; responsable_dni: string; multas_url: string; cedula_url: string }
 
 export default function VehiclesPage() {
@@ -222,15 +222,16 @@ export default function VehiclesPage() {
                   <th className="text-left px-4 py-3">Límite $/mes</th>
                   <th className="text-left px-4 py-3">VTV</th>
                   <th className="text-left px-4 py-3">Documentos</th>
+                  <th className="text-left px-4 py-3">Km Totales</th>
                   <th className="text-left px-4 py-3">Estado</th>
                   <th className="text-right px-4 py-3">Acciones</th>
                 </tr>
               </thead>
               <tbody>
           {loading ? (
-            <tr><td colSpan={9} className="text-center py-10 text-gray-500">Cargando...</td></tr>
+            <tr><td colSpan={10} className="text-center py-10 text-gray-500">Cargando...</td></tr>
           ) : vehicles.length === 0 ? (
-            <tr><td colSpan={9} className="text-center py-10 text-gray-500">No hay vehículos</td></tr>
+            <tr><td colSpan={10} className="text-center py-10 text-gray-500">No hay vehículos</td></tr>
           ) : vehicles.filter(v => !search || v.plate.includes(search)).map((v) => (<>
             <tr key={v.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
               <td className="px-4 py-3">
@@ -265,6 +266,9 @@ export default function VehiclesPage() {
                   {!v.cedula_url && !v.multas_url && <span className="text-gray-600 text-xs">—</span>}
                 </div>
               </td>
+              <td className="px-4 py-3 font-mono text-sm">
+                {v.total_km ? `${v.total_km.toLocaleString('es-AR')} km` : <span className="text-gray-600">0 km</span>}
+              </td>
               <td className="px-4 py-3">
                 <select value={v.status} onChange={(e) => handleStatus(v.id, e.target.value as Vehicle['status'])}
                   className={`px-2 py-1 rounded-full text-xs font-semibold border-0 cursor-pointer ${STATUS_COLORS[v.status]} bg-transparent`}>
@@ -289,7 +293,7 @@ export default function VehiclesPage() {
 
               {/* Panel de edición */}
               {editingId === v.id && (
-              <tr><td colSpan={9} className="px-4 pb-4">
+              <tr><td colSpan={10} className="px-4 pb-4">
                 <div className="bg-gray-800/50 rounded-2xl p-4 mt-1 flex flex-col gap-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
