@@ -24,7 +24,7 @@ export default function VehiclesPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [showForm, setShowForm] = useState(false)
-  const [form, setForm] = useState({ plate: '', type: 'auto' as typeof TIPOS[number] })
+  const [form, setForm] = useState({ plate: '', type: 'auto' as typeof TIPOS[number], responsable_nombre: '', responsable_dni: '', password: '', fuel_limit: '' })
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '', vtv_status: 'habilitada', responsable_nombre: '', responsable_dni: '', multas_url: '', cedula_url: '' })
@@ -48,11 +48,18 @@ export default function VehiclesPage() {
     const res = await fetch('/api/vehicles', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: form.type, plate: form.plate.trim().toUpperCase() }),
+      body: JSON.stringify({
+        type: form.type,
+        plate: form.plate.trim().toUpperCase(),
+        responsable_nombre: form.responsable_nombre || null,
+        responsable_dni: form.responsable_dni || null,
+        password: form.password || null,
+        fuel_limit: form.fuel_limit ? Number(form.fuel_limit) : null,
+      }),
     })
     const data = await res.json()
     if (!res.ok) { setError(data.error ?? 'Error al guardar'); setSaving(false); return }
-    setForm({ plate: '', type: 'auto' })
+    setForm({ plate: '', type: 'auto', responsable_nombre: '', responsable_dni: '', password: '', fuel_limit: '' })
     setShowForm(false)
     setSaving(false)
     loadAll()
@@ -135,17 +142,39 @@ export default function VehiclesPage() {
         </div>
 
         {showForm && (
-          <form onSubmit={handleAdd} className="bg-gray-900 rounded-2xl p-5 mb-6 flex flex-wrap gap-4 items-end">
-            <div className="flex flex-col gap-1 flex-1 min-w-40">
-              <label className="text-xs text-gray-400 uppercase tracking-wider">Patente</label>
-              <input
-                type="text"
-                placeholder="Ej: GHI-012"
-                value={form.plate}
-                onChange={(e) => setForm((f) => ({ ...f, plate: e.target.value }))}
-                className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-lg font-bold uppercase focus:outline-none focus:border-blue-500"
-                maxLength={10}
-              />
+          <form onSubmit={handleAdd} className="bg-gray-900 rounded-2xl p-5 mb-6 flex flex-col gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-gray-400 uppercase tracking-wider">Patente</label>
+                <input type="text" placeholder="Ej: GHI-012" value={form.plate}
+                  onChange={(e) => setForm((f) => ({ ...f, plate: e.target.value }))}
+                  className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-lg font-bold uppercase focus:outline-none focus:border-blue-500"
+                  maxLength={10} />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-gray-400 uppercase tracking-wider">👤 Nombre del responsable</label>
+                <input type="text" placeholder="Ej: Juan Pérez" value={form.responsable_nombre}
+                  onChange={(e) => setForm((f) => ({ ...f, responsable_nombre: e.target.value }))}
+                  className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-gray-400 uppercase tracking-wider">🪪 DNI del responsable</label>
+                <input type="text" placeholder="Ej: 38123456" value={form.responsable_dni}
+                  onChange={(e) => setForm((f) => ({ ...f, responsable_dni: e.target.value }))}
+                  className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-gray-400 uppercase tracking-wider">🔒 Contraseña</label>
+                <input type="text" placeholder="Sin contraseña" value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <label className="text-xs text-gray-400 uppercase tracking-wider">⛽ Límite combustible ($/mes)</label>
+                <input type="number" placeholder="Sin límite" value={form.fuel_limit}
+                  onChange={(e) => setForm((f) => ({ ...f, fuel_limit: e.target.value }))}
+                  className="bg-gray-800 border border-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500" />
+              </div>
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-xs text-gray-400 uppercase tracking-wider">Tipo</label>
@@ -158,11 +187,13 @@ export default function VehiclesPage() {
                 ))}
               </div>
             </div>
-            <button type="submit" disabled={saving}
-              className="bg-green-600 hover:bg-green-500 disabled:bg-gray-700 px-6 py-2.5 rounded-xl font-bold transition-colors">
-              {saving ? 'Guardando...' : '✓ Guardar'}
-            </button>
-            {error && <p className="w-full text-red-400 text-sm">{error}</p>}
+            <div className="flex gap-3">
+              <button type="submit" disabled={saving}
+                className="bg-green-600 hover:bg-green-500 disabled:bg-gray-700 px-6 py-2.5 rounded-xl font-bold transition-colors">
+                {saving ? 'Guardando...' : '✓ Guardar'}
+              </button>
+            </div>
+            {error && <p className="text-red-400 text-sm">{error}</p>}
           </form>
         )}
 
