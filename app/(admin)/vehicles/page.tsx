@@ -214,7 +214,7 @@ export default function VehiclesPage() {
               {/* Info rápida */}
               <div className="flex gap-4 mt-2 text-xs text-gray-500 flex-wrap">
                 {v.password ? <span>🔒 Con contraseña</span> : <span>🔓 Sin contraseña</span>}
-                {v.fuel_limit ? <span>⛽ Límite: {v.fuel_limit}L/mes</span> : <span>⛽ Sin límite</span>}
+                {v.fuel_limit ? <span>⛽ Límite: ${v.fuel_limit}/mes</span> : <span>⛽ Sin límite</span>}
                 {v.responsable_nombre && <span>👤 {v.responsable_nombre}</span>}
                 {v.responsable_dni && <span>🪪 DNI: {v.responsable_dni}</span>}
               </div>
@@ -246,7 +246,7 @@ export default function VehiclesPage() {
                       />
                     </div>
                     <div className="flex flex-col gap-1">
-                      <label className="text-xs text-gray-400 uppercase tracking-wider">⛽ Límite combustible (L/mes)</label>
+                      <label className="text-xs text-gray-400 uppercase tracking-wider">⛽ Límite combustible ($/mes)</label>
                       <input
                         type="number"
                         placeholder="Sin límite"

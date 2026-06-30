@@ -39,7 +39,7 @@ export default function HubPage() {
 
   const fuelLimit = trip.vehicles?.fuel_limit ?? null
   const fuelRemaining = fuelLimit !== null && usedLiters !== null ? Math.max(fuelLimit - usedLiters, 0) : null
-  const fuelUsedPct = fuelLimit && usedLiters !== null ? Math.min((usedLiters / fuelLimit) * 100, 100) : null
+  const fuelUsedPct = fuelLimit && usedLiters !== null && fuelLimit > 0 ? Math.min((usedLiters / fuelLimit) * 100, 100) : null
 
   return (
     <div className="flex flex-col gap-6 pt-4">
@@ -90,7 +90,7 @@ export default function HubPage() {
           <div className="flex justify-between text-sm">
             <span className="text-gray-400">⛽ Combustible mensual</span>
             <span className={fuelRemaining === 0 ? 'text-red-400 font-bold' : 'text-white'}>
-              {fuelRemaining?.toFixed(1)}L restantes / {fuelLimit}L
+              ${fuelRemaining?.toLocaleString('es-AR')} restantes / ${fuelLimit?.toLocaleString('es-AR')}
             </span>
           </div>
           <div className="w-full bg-gray-700 rounded-full h-3">
