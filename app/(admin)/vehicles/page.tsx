@@ -166,62 +166,87 @@ export default function VehiclesPage() {
           </form>
         )}
 
-        <div className="flex flex-col gap-4">
+        <div className="bg-gray-900 rounded-2xl overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-gray-800 text-gray-400 text-xs uppercase tracking-wider">
+                  <th className="text-left px-4 py-3">Vehículo</th>
+                  <th className="text-left px-4 py-3">Responsable</th>
+                  <th className="text-left px-4 py-3">DNI</th>
+                  <th className="text-left px-4 py-3">Contraseña</th>
+                  <th className="text-left px-4 py-3">Límite $/mes</th>
+                  <th className="text-left px-4 py-3">VTV</th>
+                  <th className="text-left px-4 py-3">Documentos</th>
+                  <th className="text-left px-4 py-3">Estado</th>
+                  <th className="text-right px-4 py-3">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
           {loading ? (
-            <div className="text-center py-10 text-gray-500">Cargando...</div>
+            <tr><td colSpan={9} className="text-center py-10 text-gray-500">Cargando...</td></tr>
           ) : vehicles.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">No hay vehículos</div>
-          ) : vehicles.map((v) => (
-            <div key={v.id} className="bg-gray-900 rounded-2xl p-5">
-              <div className="flex items-center justify-between flex-wrap gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{TIPO_ICONS[v.type]}</span>
+            <tr><td colSpan={9} className="text-center py-10 text-gray-500">No hay vehículos</td></tr>
+          ) : vehicles.map((v) => (<>
+            <tr key={v.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
+              <td className="px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl">{TIPO_ICONS[v.type]}</span>
                   <div>
-                    <p className="font-bold text-xl">{v.plate}</p>
-                    <p className="text-gray-400 text-sm capitalize">{v.type}</p>
+                    <p className="font-bold">{v.plate}</p>
+                    <p className="text-gray-400 text-xs capitalize">{v.type}</p>
                   </div>
+                </div>
+              </td>
+              <td className="px-4 py-3">{v.responsable_nombre ?? <span className="text-gray-600">—</span>}</td>
+              <td className="px-4 py-3">{v.responsable_dni ?? <span className="text-gray-600">—</span>}</td>
+              <td className="px-4 py-3">{v.password ? <span className="text-green-400">🔒 Sí</span> : <span className="text-gray-600">—</span>}</td>
+              <td className="px-4 py-3">{v.fuel_limit ? `$${v.fuel_limit.toLocaleString('es-AR')}` : <span className="text-gray-600">—</span>}</td>
+              <td className="px-4 py-3">
+                <div className="flex flex-col gap-1">
+                  {v.vtv_url
+                    ? <a href={v.vtv_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline text-xs">📄 VTV</a>
+                    : <span className="text-gray-600 text-xs">—</span>}
                   {v.vtv_url && (
-                    <a href={v.vtv_url} target="_blank" rel="noopener noreferrer"
-                      className="text-xs bg-blue-600/20 text-blue-400 px-2 py-1 rounded-lg hover:bg-blue-600/40 transition-colors">
-                      📄 VTV
-                    </a>
-                  )}
-                  {v.vtv_url && (
-                    <span className={`text-xs px-2 py-1 rounded-lg font-semibold ${v.vtv_status === 'vencida' ? 'bg-red-500/20 text-red-400' : 'bg-green-500/20 text-green-400'}`}>
-                      {v.vtv_status === 'vencida' ? '🔴 VTV Vencida' : '🟢 VTV Habilitada'}
+                    <span className={`text-xs font-semibold ${v.vtv_status === 'vencida' ? 'text-red-400' : 'text-green-400'}`}>
+                      {v.vtv_status === 'vencida' ? '🔴 Vencida' : '🟢 Habilitada'}
                     </span>
                   )}
                 </div>
-                <div className="flex items-center gap-3">
-                  <select value={v.status} onChange={(e) => handleStatus(v.id, e.target.value as Vehicle['status'])}
-                    className={`px-3 py-1 rounded-full text-xs font-semibold border-0 cursor-pointer ${STATUS_COLORS[v.status]} bg-transparent`}>
-                    <option value="available">Disponible</option>
-                    <option value="in_use">En uso</option>
-                    <option value="maintenance">Mantenimiento</option>
-                  </select>
-                  <span className={`px-2 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[v.status]}`}>{STATUS_LABELS[v.status]}</span>
+              </td>
+              <td className="px-4 py-3">
+                <div className="flex flex-col gap-1">
+                  {v.cedula_url && <a href={v.cedula_url} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:text-blue-300 underline text-xs">📋 Cédula</a>}
+                  {v.multas_url && <a href={v.multas_url} target="_blank" rel="noopener noreferrer" className="text-orange-400 hover:text-orange-300 underline text-xs">🚨 Multas</a>}
+                  {!v.cedula_url && !v.multas_url && <span className="text-gray-600 text-xs">—</span>}
+                </div>
+              </td>
+              <td className="px-4 py-3">
+                <select value={v.status} onChange={(e) => handleStatus(v.id, e.target.value as Vehicle['status'])}
+                  className={`px-2 py-1 rounded-full text-xs font-semibold border-0 cursor-pointer ${STATUS_COLORS[v.status]} bg-transparent`}>
+                  <option value="available">Disponible</option>
+                  <option value="in_use">En uso</option>
+                  <option value="maintenance">Mantenimiento</option>
+                </select>
+              </td>
+              <td className="px-4 py-3 text-right">
+                <div className="flex gap-2 justify-end">
                   <button onClick={() => editingId === v.id ? setEditingId(null) : startEdit(v)}
                     className="text-blue-400 hover:text-blue-300 text-sm transition-colors">
-                    {editingId === v.id ? 'Cerrar' : '⚙️ Config'}
+                    {editingId === v.id ? 'Cerrar' : '⚙️ Editar'}
                   </button>
                   <button onClick={() => handleDelete(v.id, v.plate)}
                     className="text-red-400 hover:text-red-300 text-sm transition-colors">
                     Eliminar
                   </button>
                 </div>
-              </div>
-
-              {/* Info rápida */}
-              <div className="flex gap-4 mt-2 text-xs text-gray-500 flex-wrap">
-                {v.password ? <span>🔒 Con contraseña</span> : <span>🔓 Sin contraseña</span>}
-                {v.fuel_limit ? <span>⛽ Límite: ${v.fuel_limit}/mes</span> : <span>⛽ Sin límite</span>}
-                {v.responsable_nombre && <span>👤 {v.responsable_nombre}</span>}
-                {v.responsable_dni && <span>🪪 DNI: {v.responsable_dni}</span>}
-              </div>
+              </td>
+            </tr>
 
               {/* Panel de edición */}
               {editingId === v.id && (
-                <div className="mt-4 pt-4 border-t border-gray-800 flex flex-col gap-4">
+              <tr><td colSpan={9} className="px-4 pb-4">
+                <div className="bg-gray-800/50 rounded-2xl p-4 mt-1 flex flex-col gap-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex flex-col gap-1">
                       <label className="text-xs text-gray-400 uppercase tracking-wider">👤 Nombre del responsable</label>
@@ -351,9 +376,12 @@ export default function VehiclesPage() {
                     ✓ Guardar cambios
                   </button>
                 </div>
+              </td></tr>
               )}
-            </div>
-          ))}
+            </>))}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
