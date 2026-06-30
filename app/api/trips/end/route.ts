@@ -12,8 +12,7 @@ export async function POST(req: Request) {
     .from('trips').update({ km_end, ended_at, status: 'closed' } as any).eq('id', trip_id)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  if (vehicle_id)
-    await getDb().from('vehicles').update({ status: 'available' } as any).eq('id', vehicle_id)
+  // Estado del vehículo solo lo modifica el admin desde el panel
 
   return NextResponse.json({ ok: true })
 }

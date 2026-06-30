@@ -15,6 +15,6 @@ export async function POST(req: Request) {
   } as any)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  await getDb().from('vehicles').update({ status: 'in_use' } as any).eq('id', vehicle_id)
+  // Estado del vehículo solo lo modifica el admin desde el panel
   return NextResponse.json({ ok: true })
 }
