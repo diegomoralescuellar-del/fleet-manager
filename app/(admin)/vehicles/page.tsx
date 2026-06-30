@@ -26,6 +26,7 @@ export default function VehiclesPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ plate: '', type: 'auto' as typeof TIPOS[number], responsable_nombre: '', responsable_dni: '', password: '', fuel_limit: '' })
   const [error, setError] = useState('')
+  const [search, setSearch] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editState, setEditState] = useState<EditState>({ password: '', fuel_limit: '', vtv_url: '', vtv_status: 'habilitada', responsable_nombre: '', responsable_dni: '', multas_url: '', cedula_url: '' })
   const [uploadingVtv, setUploadingVtv] = useState(false)
@@ -133,12 +134,24 @@ export default function VehiclesPage() {
             </button>
             <h1 className="text-2xl font-bold">Gestión de Vehículos</h1>
           </div>
-          <button
-            onClick={() => { setShowForm(!showForm); setError('') }}
-            className="bg-blue-600 hover:bg-blue-500 px-5 py-2.5 rounded-xl font-semibold transition-colors"
-          >
-            {showForm ? '✕ Cancelar' : '+ Agregar Vehículo'}
-          </button>
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+              <input
+                type="text"
+                placeholder="Buscar patente..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value.toUpperCase())}
+                className="bg-gray-800 border border-gray-700 rounded-xl pl-9 pr-4 py-2.5 text-sm font-mono uppercase focus:outline-none focus:border-blue-500 w-44"
+              />
+            </div>
+            <button
+              onClick={() => { setShowForm(!showForm); setError('') }}
+              className="bg-blue-600 hover:bg-blue-500 px-5 py-2.5 rounded-xl font-semibold transition-colors"
+            >
+              {showForm ? '✕ Cancelar' : '+ Agregar Vehículo'}
+            </button>
+          </div>
         </div>
 
         {showForm && (
@@ -218,7 +231,7 @@ export default function VehiclesPage() {
             <tr><td colSpan={9} className="text-center py-10 text-gray-500">Cargando...</td></tr>
           ) : vehicles.length === 0 ? (
             <tr><td colSpan={9} className="text-center py-10 text-gray-500">No hay vehículos</td></tr>
-          ) : vehicles.map((v) => (<>
+          ) : vehicles.filter(v => !search || v.plate.includes(search)).map((v) => (<>
             <tr key={v.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
               <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
